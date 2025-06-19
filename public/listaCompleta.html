@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lista Completa de Produtos</title>
+  <style>
+    body {
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      font-size: 18px;
+    }
+
+    #menu {
+      background-color: #333;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #menu a {
+      text-decoration: none;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      margin: 0 20px;
+    }
+
+    #main-content {
+      margin: 20px;
+    }
+
+    #logo {
+      max-width: 80px;
+      height: auto;
+      order: -1;
+    }
+
+    #resultadosListaCompleta {
+      margin-top: 20px;
+      text-align: left;
+      padding: 0 20px;
+    }
+
+    .produto {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 10px;
+    }
+
+    .produto p {
+      margin: 2px 0;
+    }
+
+    button {
+      cursor: pointer;
+      padding: 5px 10px;
+      font-size: 14px;
+    }
+
+    button.excluir {
+      margin-left: 10px;
+      background-color: red;
+      color: white;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="menu">
+    <img id="logo" src="logo.png" alt="Logo da Empresa" />
+    <div>
+      <a onclick="redirecionarParaPagina('index.html')">Home</a>
+      <a onclick="redirecionarParaPagina('calcular.html')">Calcular e Adicionar Produto</a>
+      <a onclick="redirecionarParaPagina('consultar.html')">Consultar Produtos</a>
+      <a onclick="redirecionarParaPagina('remover.html')">Remover Produto</a>
+    </div>
+  </div>
+
+  <div id="main-content">
+    <h1>Lista Completa de Produtos</h1>
+  </div>
+
+  <div id="resultadosListaCompleta">
+    <h2>Lista de Produtos:</h2>
+  </div>
+
+  <script>
+    let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+
+    function redirecionarParaPagina(pagina) {
+      window.location.href = pagina;
+    }
+
+    function exibirListaCompleta() {
+      if (produtos.length === 0) {
+        document.getElementById('resultadosListaCompleta').innerHTML = `
+          <h2>Lista de Produtos:</h2>
+          <p>Nenhum produto cadastrado.</p>
+        `;
+        return;
+      }
+
+      const resultadosHtml = produtos
+        .map((produto, index) => {
+          const nome = produto.nome ?? produto.name ?? '';
+          const descricao = produto.descricao ?? produto.description ?? '';
+          const preco = produto.preco ?? produto.price ?? '';
+          const peso = produto.peso ?? produto.weight ?? '';
+          const dataCadastro = produto.dataCadastro ?? produto.date ?? '';
+
+          return `
+            <div class="produto">
+              <p><strong>ID:</strong> ${produto.id ?? ''}</p>
+              <p><strong>Nome:</strong> ${nome}</p>
+              <p><strong>Descrição:</strong> ${descricao}</p>
+              <p><strong>Peso:</strong> ${peso}</p>
+              <p><strong>Preço:</strong> R$ ${preco}</p>
+              <p><strong>Data Cadastro:</strong> ${dataCadastro}</p>
+              <p><strong>Preços por Marketplace:</strong></p>
+              <ul>
+                <li>Netshoes: R$ ${produto.netshoes ?? ''}</li>
+                <li>Magalu: R$ ${produto.magalu ?? ''}</li>
+                <li>Shopee: R$ ${produto.shopee ?? ''}</li>
+                <li>B2W: R$ ${produto.b2w ?? ''}</li>
+                <li>Via Varejo: R$ ${produto.viavarejo ?? ''}</li>
+                <li>Mercado Livre: R$ ${produto.mercadoLivre ?? ''}</li>
+                <li>Aliexpress: R$ ${produto.aliexpress ?? ''}</li>
+                <li>Amazon: R$ ${produto.amazon ?? ''}</li>
+                <li>Enjoei: R$ ${produto.enjoei ?? ''}</li>
+                <li>OLX: R$ ${produto.olx ?? ''}</li>
+              </ul>
+              <button onclick="editarProduto(${index})">Editar</button>
+              <button class="excluir" onclick="excluirProduto(${index})">Excluir</button>
+            </div>
+          `;
+        })
+        .join('');
+
+      document.getElementById('resultadosListaCompleta').innerHTML = `
+        <h2>Lista de Produtos:</h2>
+        ${resultadosHtml}
+      `;
+    }
+
+    function editarProduto(index) {
+      const produto = produtos[index];
+
+      function promptNaoVazio(mensagem, valorAtual) {
+        let novoValor;
+        do {
+          novoValor = prompt(mensagem, valorAtual);
+          if (novoValor === null) return null;
+        } while (novoValor.trim() === '');
+        return novoValor;
+      }
+
+      const campos = [
+        "id", "nome", "descricao", "peso", "preco", "dataCadastro",
+        "netshoes", "magalu", "shopee", "b2w", "viavarejo", "mercadoLivre",
+        "aliexpress", "amazon", "enjoei", "olx"
+      ];
+
+      const novosValores = {};
+      for (const campo of campos) {
+        const valorAtual = produto[campo] ?? '';
+        const novoValor = promptNaoVazio(`Digite ${campo}:`, valorAtual);
+        if (novoValor === null) return;
+        novosValores[campo] = novoValor;
+      }
+
+      produtos[index] = novosValores;
+      localStorage.setItem('produtos', JSON.stringify(produtos));
+      exibirListaCompleta();
+    }
+
+    function excluirProduto(index) {
+      const confirmacao = confirm("Tem certeza que deseja excluir este produto?");
+      if (confirmacao) {
+        produtos.splice(index, 1);
+        localStorage.setItem('produtos', JSON.stringify(produtos));
+        exibirListaCompleta();
+      }
+    }
+
+    window.onload = exibirListaCompleta;
+  </script>
+</body>
+</html>

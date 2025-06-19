@@ -1,0 +1,164 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API de Utilitarios Compreshoes",
+    "description": "Essa API tem como objetivo a manipulação dos produtos",
+    "termsOfService": "http://localhost:3000/terms",
+    "contact": {
+      "email": "mafefelicissimo@gmail.com"
+    },
+    "version": "2.0.0"
+  },
+  "paths": {
+    "/produtos": {
+      "post": {
+        "summary": "Cadastro de produto",
+        "description": "Essa rota será responsável por cadastrar um novo produto",
+        "tags": ["produtos"],
+        "security": [
+          { "bearerAuth": [] }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Produto"
+              },
+              "examples": {
+                "produto": {
+                  "value": {
+                    "nome": "Coturno 2064",
+                    "descricao": "Coturno de couro legítimo e palmilha gel",
+                    "peso": 1.5,
+                    "preco": 136.00
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized"
+          },
+          "400": {
+            "description": "Produto já cadastrado!"
+          },
+          "200": {
+            "description": "Produto cadastrado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Produto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/produtos/findByName": {
+      "get": {
+        "summary": "Busca de um produto pelo nome",
+        "description": "Retorna os dados de um produto com base no nome",
+        "tags": ["produtos"],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Nome do produto para busca",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Produto encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Produto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          }
+        }
+      }
+    },
+    "/produtos/{id}":{
+      "get": {
+        "summary": "Busca de um produto pelo ID",
+        "description": "Retorna os dados de um produto com base no ID",
+        "tags": ["produtos"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Nome do produto pelo ID",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Produto encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/Produto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          }
+        }
+      }
+      }
+    },
+  "components": {
+    "schemas": {
+      "Produto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identificador único do produto"
+          },
+          "nome": {
+            "type": "string",
+            "description": "Nome do produto"
+          },
+          "descricao": {
+            "type": "string",
+            "description": "Descrição detalhada do produto"
+          },
+          "peso": {
+            "type": "number",
+            "description": "Peso do produto em kg"
+          },
+          "preco": {
+            "type": "number",
+            "description": "Preço do produto em reais"
+          },
+          "dataCadastro": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de cadastro do produto"
+          }
+        },
+        "required": ["nome", "descricao", "peso", "preco"]
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

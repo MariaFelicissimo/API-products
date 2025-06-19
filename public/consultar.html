@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Consultar Produtos</title>
+  <style>
+    body { text-align: center; margin: 0; padding: 0; }
+    #menu {
+      background-color: #333;
+      color: white;
+      padding: 10px;
+    }
+    #menu a {
+      text-decoration: none;
+      color: white;
+      margin: 0 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #main-content { margin: 20px; }
+    #logo { max-width: 100%; height: auto; }
+    .error-message {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="menu">
+    <a onclick="redirecionarParaPagina('index.html')">Home</a>
+    <a onclick="redirecionarParaPagina('calcular.html')">Calcular e Adicionar Produto</a>
+    <a onclick="redirecionarParaPagina('consultar.html')">Consultar Produtos</a>
+    <a onclick="redirecionarParaPagina('remover.html')">Remover Produto</a>
+  </div>
+
+  <div id="main-content">
+    <h1>Consultar Produtos</h1>
+    <img id="logo" src="logo.png" alt="Logo da Empresa" />
+  </div>
+
+  <form id="consultaForm">
+    <label for="nomeProdutoConsulta">Nome do Produto:</label>
+    <input type="text" id="nomeProdutoConsulta" placeholder="Digite o nome" />
+    <br><br>
+    <label for="idProdutoConsulta">ID do Produto:</label>
+    <input type="text" id="idProdutoConsulta" placeholder="Digite o ID" />
+    <br>
+    <button type="button" onclick="consultarProduto()">Consultar</button>
+    <button type="button" onclick="verListaCompleta()">Ver Lista Completa</button>
+  </form>
+
+  <div id="resultadosConsulta" style="display: none;"></div>
+  <div id="mensagemErro" class="error-message" style="display: none;"></div>
+
+  <script>
+    function redirecionarParaPagina(pagina) {
+      window.location.href = pagina;
+    }
+
+    async function consultarProduto() {
+      const nome = document.getElementById('nomeProdutoConsulta').value.trim();
+      const id = document.getElementById('idProdutoConsulta').value.trim();
+      const mensagemErro = document.getElementById('mensagemErro');
+      const resultadosConsulta = document.getElementById('resultadosConsulta');
+
+      mensagemErro.style.display = 'none';
+      resultadosConsulta.style.display = 'none';
+
+      if (!nome && !id) {
+        mensagemErro.textContent = "Por favor, insira o nome ou o ID do produto.";
+        mensagemErro.style.display = 'block';
+        return;
+      }
+
+      try {
+        const res = await fetch('/consultar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, id })
+        });
+
+        if (!res.ok) {
+          if (res.status === 404) {
+            throw new Error('Produto não encontrado');
+          } else {
+            throw new Error(`Erro: ${res.status}`);
+          }
+        }
+
+        const produto = await res.json();
+
+        resultadosConsulta.innerHTML = `
+          <h2>Resultado:</h2>
+          <p><strong>ID:</strong> ${produto.id}</p>
+          <p><strong>Nome:</strong> ${produto.name}</p>
+          <p><strong>Descrição:</strong> ${produto.description}</p>
+          <p><strong>Preço:</strong> R$ ${produto.price}</p>
+          <button onclick="removerProduto('${produto.id}')">Remover Produto</button>
+        `;
+        resultadosConsulta.style.display = 'block';
+
+      } catch (err) {
+        mensagemErro.textContent = err.message || "Erro ao consultar produto.";
+        mensagemErro.style.display = 'block';
+        console.error(err);
+      }
+    }
+
+    function verListaCompleta() {
+      window.location.href = 'listaCompleta.html';
+    }
+
+    async function removerProduto(id) {
+      try {
+        const res = await fetch('/remover', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+
+        alert(`Produto com ID "${id}" removido com sucesso.`);
+        consultarProduto();
+      } catch (err) {
+        alert("Erro ao remover produto.");
+        console.error(err);
+      }
+    }
+  </script>
+
+</body>
+</html>

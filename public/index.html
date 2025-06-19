@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utilitários Administradores Compreshoes</title>
+    <style>
+        body {
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        #menu {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        #menu a {
+            text-decoration: none;
+            color: white;
+            margin: 0 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #main-content {
+            text-align: center;
+            margin: 20px;
+        }
+
+        #logo {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="menu">
+        <a onclick="redirecionarParaPagina('index.html')">Home</a>
+        <a onclick="redirecionarParaPagina('calcular.html')">Calcular e Adicionar Produto</a>
+        <a onclick="redirecionarParaPagina('consultar.html')">Consultar Produtos</a>
+        <a onclick="redirecionarParaPagina('remover.html')">Remover Produto</a>
+    </div>
+
+    <div id="main-content">
+        <h1>Utilitários Administradores</h1>
+        <img id="logo" src="logo.png" alt="Logo da Empresa">
+    </div>
+
+    <script>
+        function redirecionarParaPagina(pagina) {
+            window.location.href = pagina;
+        }
+    </script>
+
+</body>
+</html>

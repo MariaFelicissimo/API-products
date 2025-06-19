@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remover Produto</title>
+    <style>
+        body {
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        #menu {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        #menu a {
+            text-decoration: none;
+            color: white;
+            margin: 0 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #main-content {
+            text-align: center;
+            margin: 20px;
+        }
+
+        #logo {
+            max-width: 80%;
+            height: auto;
+        }
+
+        #produtoForm {
+            margin-top: 20px;
+        }
+
+        #produtoForm label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        #produtoForm input[type="text"] {
+            padding: 5px;
+            width: 200px;
+        }
+
+        #produtoForm button {
+            padding: 8px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        #mensagemErro {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="menu">
+        <a onclick="redirecionarParaPagina('index.html')">Home</a>
+        <a onclick="redirecionarParaPagina('calcular.html')">Calcular e Adicionar Produto</a>
+        <a onclick="redirecionarParaPagina('consultar.html')">Consultar Produtos</a>
+        <a onclick="redirecionarParaPagina('remover.html')">Remover Produto</a>
+    </div>
+
+    <div id="main-content">
+        <h1>Remover Produto</h1>
+        <img id="logo" src="logo.png" alt="Logo da Empresa">
+    </div>
+
+    <div id="produtoForm">
+        <form>
+            <label for="nomeProdutoRemover">Nome do Produto a Remover:</label>
+            <input type="text" id="nomeProdutoRemover" required>
+            <br>
+            <button type="button" onclick="removerProduto()">Remover</button>
+            <p id="mensagemErro"></p>
+        </form>
+    </div>
+
+    <script>
+        function redirecionarParaPagina(pagina) {
+            window.location.href = pagina;
+        }
+
+        function removerProduto() {
+            const nomeProdutoRemover = document.getElementById('nomeProdutoRemover').value;
+            let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+            const indiceProduto = produtos.findIndex(produto => produto.nome.toLowerCase() === nomeProdutoRemover.toLowerCase());
+            
+            if (indiceProduto !== -1) {
+                produtos.splice(indiceProduto, 1);
+                localStorage.setItem('produtos', JSON.stringify(produtos));
+                alert(`Produto "${nomeProdutoRemover}" removido com sucesso.`);
+                document.getElementById('mensagemErro').innerText = "";
+            } else {
+                document.getElementById('mensagemErro').innerText = `Produto "${nomeProdutoRemover}" não encontrado.`;
+            }
+        }
+    </script>
+
+</body>
+</html>
