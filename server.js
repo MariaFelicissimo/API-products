@@ -1,45 +1,48 @@
 const express = require('express');
 const swaggerUI = require('swagger-ui-express');
 const swaggerDocs = require('./swagger.json');
+require('dotenv').config();
+// -----------------------------------------------------------------------------------------
 
 const app = express();
-const port = 3000;
+
+const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
 // Middleware de autenticação para rotas protegidas
 app.use((req, res, next) => {
   const auth = req.headers.authorization;
+  // Exemplo de autenticação para requisições POST para /produtos
   if (req.path.startsWith('/produtos') && req.method === 'POST') {
     if (!auth || !auth.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      return res.status(401).json({ error: 'Unauthorized: Token is missing or invalid' });
     }
   }
-  next();
+  next(); // Permite que a requisição prossiga para a próxima middleware/rota
 });
 
-// Swagger
+// Swagger (documentação da API)
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
-// Banco de dados em memória
-let produtos = [];
+let produtos = []; // Mantenha isso APENAS se você não for usar um banco de dados real.
 
-// Servir arquivos estáticos (HTML/CSS/JS)
+// Servir arquivos estáticos (HTML/CSS/JS da pasta 'public')
 app.use(express.static('public'));
 
-// Rotas de páginas HTML
+// Rotas para as páginas HTML
 app.get('/', (req, res) => res.sendFile(__dirname + '/public/index.html'));
 app.get('/calcular', (req, res) => res.sendFile(__dirname + '/public/calcular.html'));
 app.get('/consultar', (req, res) => res.sendFile(__dirname + '/public/consultar.html'));
 app.get('/remover', (req, res) => res.sendFile(__dirname + '/public/remover.html'));
 app.get('/listaCompleta', (req, res) => res.sendFile(__dirname + '/public/listaCompleta.html'));
 
-// Termos de serviço (usado no Swagger)
+// Rota de termos de serviço (usado no Swagger)
 app.get('/terms', (req, res) => {
   res.json({ message: 'Termos de Serviço' });
 });
 
-// POST /produtos — adiciona produto
+// Rotas da API (usando o array 'produtos' em memória)
 app.post('/produtos', (req, res) => {
   const body = req.body;
 
@@ -81,7 +84,6 @@ app.post('/produtos', (req, res) => {
   return res.status(200).json(novoProduto);
 });
 
-// POST /consultar — por nome ou id
 app.post('/consultar', (req, res) => {
   const termo = req.body.nome?.toLowerCase() || req.body.id;
 
@@ -94,7 +96,6 @@ app.post('/consultar', (req, res) => {
   return res.status(404).json({ error: 'Produto não encontrado' });
 });
 
-// POST /remover — remove por nome ou id
 app.post('/remover', (req, res) => {
   const termo = req.body.nome?.toLowerCase() || req.body.id;
 
@@ -113,7 +114,7 @@ app.post('/remover', (req, res) => {
 
 // Inicia o servidor
 app.listen(port, () => {
-  console.log(`Servidor rodando em http://localhost:${port}`);
+  console.log(`Servidor rodando na porta ${port}`); // Mensagem genérica para funcionar localmente e no Render
 });
 
 module.exports = app;
